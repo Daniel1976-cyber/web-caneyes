@@ -1,17 +1,595 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurante Buffet "Los Taínos" | Hotel Los Caneyes</title>
+    <title>Restaurante y Reservas Gastronomicas | Los Caneyes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        /* ===== ESTILOS ESPECIFICOS RESTAURANTE ===== */
+        .restaurant-hero {
+            position: relative;
+            height: 60vh;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+        }
+        .restaurant-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1920&q=80') center/cover;
+            opacity: 0.4;
+        }
+        .restaurant-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(27,54,93,0.5) 0%, rgba(27,54,93,0.8) 100%);
+        }
+        .restaurant-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        .restaurant-hero-subtitle {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+        .restaurant-hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 300;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .restaurant-hero-title span {
+            font-weight: 600;
+            color: var(--color-accent);
+        }
+        .restaurant-hero-desc {
+            font-size: 16px;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.85;
+            line-height: 1.8;
+        }
+
+        /* ===== SISTEMA DE RESERVAS ===== */
+        .reservations-section {
+            background: var(--color-bg-warm);
+            padding: 80px 0;
+        }
+        .reservations-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        @media (max-width: 768px) {
+            .reservations-container { padding: 0 20px; }
+            .reservations-section { padding: 60px 0; }
+        }
+
+        /* Role Switcher */
+        .role-switcher {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            justify-content: center;
+        }
+        .role-btn {
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            border: 1.5px solid var(--color-primary);
+            background: transparent;
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-sans);
+        }
+        .role-btn:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+        .role-btn.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        /* Tabs */
+        .res-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e5e5e5;
+        }
+        .res-tab {
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--color-text-light);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-sans);
+            margin-bottom: -2px;
+        }
+        .res-tab:hover {
+            color: var(--color-primary);
+        }
+        .res-tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-accent);
+        }
+        @media (max-width: 768px) {
+            .res-tabs { flex-wrap: wrap; }
+            .res-tab { padding: 10px 16px; font-size: 12px; }
+        }
+
+        .res-section { display: none; }
+        .res-section.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        /* Service Cards */
+        .service-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 24px;
+        }
+        .service-card-rc {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: var(--transition);
+        }
+        .service-card-rc:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+        .service-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 24px 28px 16px;
+            gap: 16px;
+        }
+        .service-card-title {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+        .service-card-location {
+            font-size: 13px;
+            color: var(--color-text-light);
+        }
+        .service-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            border-radius: 4px;
+            background: rgba(211, 84, 0, 0.1);
+            color: var(--color-accent);
+            white-space: nowrap;
+        }
+        .service-tag.evening { background: rgba(123, 31, 162, 0.1); color: #7b1fa2; }
+        .service-tag.night { background: rgba(211, 47, 47, 0.1); color: #c0392b; }
+        .service-schedule {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .service-schedule th {
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text-light);
+            padding: 10px 28px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .service-schedule td {
+            padding: 12px 28px;
+            color: var(--color-text);
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .service-schedule tr:last-child td { border-bottom: none; }
+        .service-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 16px 28px;
+            font-size: 13px;
+            color: var(--color-text-light);
+            background: #fafafa;
+        }
+        .service-note i {
+            color: var(--color-accent);
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Forms */
+        .res-form-group {
+            margin-bottom: 20px;
+        }
+        .res-form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-text-light);
+            margin-bottom: 8px;
+        }
+        .res-form-input, .res-form-select, .res-form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 4px;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            color: var(--color-text);
+            background: white;
+            transition: var(--transition);
+            outline: none;
+        }
+        .res-form-input:focus, .res-form-select:focus, .res-form-textarea:focus {
+            border-color: var(--color-accent);
+        }
+        .res-form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .res-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 768px) {
+            .res-form-row { grid-template-columns: 1fr; }
+        }
+
+        /* Buttons */
+        .res-btn {
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-sans);
+        }
+        .res-btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+        .res-btn-primary:hover {
+            background: var(--color-accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(211, 84, 0, 0.3);
+        }
+        .res-btn-secondary {
+            background: white;
+            color: var(--color-primary);
+            border: 1.5px solid #e5e5e5;
+        }
+        .res-btn-secondary:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+        .res-btn-success {
+            background: var(--color-secondary);
+            color: white;
+        }
+        .res-btn-success:hover {
+            background: #219a52;
+        }
+        .res-btn-danger {
+            background: rgba(192, 57, 43, 0.1);
+            color: #c0392b;
+            border: 1px solid rgba(192, 57, 43, 0.2);
+        }
+        .res-btn-danger:hover {
+            background: rgba(192, 57, 43, 0.15);
+        }
+        .res-btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        /* Alerts */
+        .res-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .res-alert-warning {
+            background: rgba(237, 108, 2, 0.08);
+            border: 1px solid rgba(237, 108, 2, 0.2);
+            color: var(--color-text);
+        }
+        .res-alert-warning i { color: var(--color-accent); flex-shrink: 0; margin-top: 2px; }
+        .res-alert-info {
+            background: rgba(27, 54, 93, 0.06);
+            border: 1px solid rgba(27, 54, 93, 0.15);
+            color: var(--color-text);
+        }
+        .res-alert-info i { color: var(--color-primary); flex-shrink: 0; margin-top: 2px; }
+        .res-alert-success {
+            background: rgba(39, 174, 96, 0.08);
+            border: 1px solid rgba(39, 174, 96, 0.2);
+            color: var(--color-text);
+        }
+        .res-alert-success i { color: var(--color-secondary); flex-shrink: 0; margin-top: 2px; }
+
+        /* Reservation Cards */
+        .res-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: var(--transition);
+        }
+        .res-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .res-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .res-card-title {
+            font-family: var(--font-serif);
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+        .res-card-meta {
+            font-size: 13px;
+            color: var(--color-text-light);
+        }
+        .res-card-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--color-text-light);
+            margin-top: 4px;
+        }
+        .res-card-row i {
+            color: var(--color-accent);
+            width: 14px;
+            text-align: center;
+        }
+        .res-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        .status-pendiente { background: rgba(237, 108, 2, 0.1); color: #d35400; }
+        .status-confirmada { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+        .status-cancelada { background: rgba(192, 57, 43, 0.1); color: #c0392b; }
+
+        /* Summary Box */
+        .summary-box {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #eee;
+        }
+        .summary-title {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-primary);
+            margin-bottom: 16px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { color: var(--color-text-light); }
+        .summary-value { font-weight: 600; color: var(--color-primary); }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #eee;
+        }
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--color-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-bar .res-form-input, .filter-bar .res-form-select {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        /* Email preview */
+        .email-preview {
+            background: #f8f8f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            color: var(--color-text-light);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--color-text-light);
+        }
+        .empty-state i {
+            font-size: 40px;
+            color: #ddd;
+            margin-bottom: 16px;
+        }
+        .empty-state-title {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            color: var(--color-text);
+            margin-bottom: 6px;
+        }
+        .empty-state-desc {
+            font-size: 14px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--color-primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Checkbox */
+        .res-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--color-text);
+            cursor: pointer;
+        }
+        .res-checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-accent);
+            cursor: pointer;
+        }
+
+        /* View toggle */
+        .view-toggle {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- HEADER -->
     <header class="header scrolled" id="header">
         <div class="header-inner">
             <a href="index.html" class="logo">
@@ -19,12 +597,13 @@
                 <span class="logo-text">Los Caneyes</span>
             </a>
             <nav class="nav" id="nav">
-                <a href="habitaciones.html" class="nav-link">Habitaciones</a>
+                <a href="index.html#habitaciones" class="nav-link">Habitaciones</a>
+                <a href="restaurante.html" class="nav-link">Restaurante</a>
                 <a href="index.html#experiencias" class="nav-link">Experiencias</a>
                 <a href="index.html#amenidades" class="nav-link">Amenidades</a>
                 <a href="index.html#ubicacion" class="nav-link">Ubicacion</a>
                 <a href="index.html#ofertas" class="nav-link">Ofertas</a>
-                <a href="contacto.html" class="nav-link">Contacto</a>
+                <a href="index.html#contacto" class="nav-link">Contacto</a>
             </nav>
             <div class="header-actions">
                 <div class="lang-selector">
@@ -32,7 +611,7 @@
                     <span>ES</span>
                     <i class="fas fa-chevron-down" style="font-size:10px;"></i>
                 </div>
-                <a href="#reservar" class="btn btn-primary">Reservar Mesa</a>
+                <a href="index.html#reservar" class="btn btn-primary">Reservar Ahora</a>
                 <div class="mobile-toggle" id="mobileToggle">
                     <i class="fas fa-bars"></i>
                 </div>
@@ -40,221 +619,324 @@
         </div>
     </header>
 
-    <section class="hero" style="height: 50vh; min-height: 400px;">
-        <div class="hero-bg" style="background: linear-gradient(135deg, #0B3D4C 0%, #1a5f6e 100%);"></div>
-        <div class="hero-bg" style="background: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1920&q=80') center/cover; opacity: 0.3; position: absolute; inset: 0;"></div>
-        <div class="hero-bg" style="background: linear-gradient(to bottom, rgba(11,61,76,0.4) 0%, rgba(11,61,76,0.8) 100%); position: absolute; inset: 0;"></div>
-        <div class="hero-content" style="padding-top: 80px;">
-            <p class="hero-subtitle">Sabor y Tradicion</p>
-            <h1 class="hero-title" style="font-size: clamp(36px, 6vw, 64px);">Restaurante <span>Los Taínos</span></h1>
-            <p class="hero-desc">Auténtico buffet cubano e internacional en un entorno que celebra nuestras raíces y la frescura de Santa Clara.</p>
-        </div>
-    
-        <div class="booking-widget" id="reservar">
-            <div class="booking-field">
-                <label class="booking-label">Llegada</label>
-                <input type="date" class="booking-input" value="2026-06-15">
-            </div>
-            <div class="booking-field">
-                <label class="booking-label">Salida</label>
-                <input type="date" class="booking-input" value="2026-06-20">
-            </div>
-            <div class="booking-field">
-                <label class="booking-label">Huespedes</label>
-                <select class="booking-input">
-                    <option>2 Adultos, 0 Ninos</option>
-                    <option>1 Adulto</option>
-                    <option>2 Adultos, 1 Nino</option>
-                    <option>2 Adultos, 2 Ninos</option>
-                </select>
-            </div>
-            <div class="booking-field">
-                <label class="booking-label">Codigo Promocional</label>
-                <input type="text" class="booking-input" placeholder="Opcional">
-            </div>
-            <button class="btn btn-primary booking-btn">
-                <i class="fas fa-search"></i> Buscar
-            </button>
+    <!-- HERO RESTAURANTE -->
+    <section class="restaurant-hero">
+        <div class="restaurant-hero-content">
+            <p class="restaurant-hero-subtitle">Sabores de Cuba e Internacionales</p>
+            <h1 class="restaurant-hero-title">Gastronomia <span>Los Caneyes</span></h1>
+            <p class="restaurant-hero-desc">Reserve su mesa en nuestros restaurantes y disfrute de una experiencia culinaria unica, desde el buffet "Los Tainos" hasta la vibrante noche del Songa Club.</p>
         </div>
     </section>
 
-    <section class="section welcome">
-        <div class="container">
-            <div class="welcome-grid reveal">
-                <div class="welcome-text">
-                    <span class="section-label">Chef Ejecutivo</span>
-                    <h2 class="section-title">Una Experiencia Gastronómica Tradicional</h2>
-                    <p>En el Restaurante Buffet "Los Taínos", fusionamos la rica tradición culinaria cubana con platos internacionales de primera calidad. Nuestro equipo utiliza ingredientes frescos de la región para ofrecer una variedad que deleita a todos los paladares.</p>
-                    <p>Ubicado en el área de jardines, el ambiente de nuestro restaurante invita a disfrutar de una comida relajada bajo la arquitectura inspirada en nuestros ancestros.</p>
-                    <div style="display: flex; gap: 30px; margin-top: 30px;">
-                        <div style="text-align: center;">
-                            <div style="font-family: var(--font-serif); font-size: 36px; color: var(--color-accent); font-weight: 600;">4.9</div>
-                            <div style="font-size: 12px; color: var(--color-text-light); text-transform: uppercase; letter-spacing: 1px;">Rating</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-family: var(--font-serif); font-size: 36px; color: var(--color-accent); font-weight: 600;">15+</div>
-                            <div style="font-size: 12px; color: var(--color-text-light); text-transform: uppercase; letter-spacing: 1px;">Anos de Excelencia</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-family: var(--font-serif); font-size: 36px; color: var(--color-accent); font-weight: 600;">3</div>
-                            <div style="font-size: 12px; color: var(--color-text-light); text-transform: uppercase; letter-spacing: 1px;">Estrellas Michelin</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="welcome-image" style="height: 500px;">
-                    <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80" alt="Chef en accion">
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- SECCION RESERVAS -->
+    <section class="reservations-section">
+        <div class="reservations-container">
 
-    <section class="section" style="background: var(--color-bg-warm);">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Nuestros Platos</span>
-                <h2 class="section-title">Menu Destacado</h2>
-                <p class="section-desc">Una seleccion de nuestros platos mas celebrados por criticos y huespedes.</p>
+            <div class="section-header" style="margin-bottom: 40px;">
+                <span class="section-label">Reservas en Linea</span>
+                <h2 class="section-title">Sistema de Reservas Gastronomicas</h2>
+                <p class="section-desc">Gestione sus reservas de restaurante de forma rapida y sencilla. Disponible para huespedes y personal de recepcion.</p>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px;">
-                <div class="reveal" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex;">
-                    <div style="width: 200px; height: 200px; flex-shrink: 0;">
-                        <img src="https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=400&q=80" alt="Langosta" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="padding: 24px; flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--color-primary);">Langosta en Salsa de Ron</h3>
-                            <span style="font-family: var(--font-serif); font-size: 20px; color: var(--color-accent); font-weight: 600;">$42</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--color-text-light); line-height: 1.6;">Langosta fresca del Caribe con reduccion de ron anejo, acompanada de pure de malanga y vegetales de temporada.</p>
-                    </div>
-                </div>
-                <div class="reveal" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex;">
-                    <div style="width: 200px; height: 200px; flex-shrink: 0;">
-                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80" alt="Ropa Vieja" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="padding: 24px; flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--color-primary);">Ropa Vieja de Autor</h3>
-                            <span style="font-family: var(--font-serif); font-size: 20px; color: var(--color-accent); font-weight: 600;">$28</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--color-text-light); line-height: 1.6;">Nuestra interpretacion moderna del clasico cubano, con carne deshebrada en salsa de tomate criollo y arroz congris.</p>
-                    </div>
-                </div>
-                <div class="reveal" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex;">
-                    <div style="width: 200px; height: 200px; flex-shrink: 0;">
-                        <img src="https://images.unsplash.com/photo-1432139509613-5c4258f97d03?w=400&q=80" alt="Pescado" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="padding: 24px; flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--color-primary);">Pescado del Dia</h3>
-                            <span style="font-family: var(--font-serif); font-size: 20px; color: var(--color-accent); font-weight: 600;">$35</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--color-text-light); line-height: 1.6;">Captura del dia a la parrilla con mantequilla de hierbas, servido con yuca al mojo y ensalada de aguacate.</p>
-                    </div>
-                </div>
-                <div class="reveal" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex;">
-                    <div style="width: 200px; height: 200px; flex-shrink: 0;">
-                        <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&q=80" alt="Postre" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="padding: 24px; flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--color-primary);">Tres Leches Tropical</h3>
-                            <span style="font-family: var(--font-serif); font-size: 20px; color: var(--color-accent); font-weight: 600;">$14</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--color-text-light); line-height: 1.6;">El postre insignia del Caribe con un toque de Los Caneyes: coco tostado, frutas exoticas y reduccion de maracuya.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="section amenities">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Horarios y Servicios</span>
-                <h2 class="section-title">Informacion del Restaurante</h2>
+            <!-- ROLE SWITCHER -->
+            <div class="role-switcher">
+                <button class="role-btn active" id="btnRoleGuest" onclick="setRole('guest')">
+                    <i class="fas fa-user" style="margin-right:6px;"></i> Modo Huesped
+                </button>
+                <button class="role-btn" id="btnRoleReception" onclick="setRole('reception')">
+                    <i class="fas fa-concierge-bell" style="margin-right:6px;"></i> Modo Recepcion
+                </button>
             </div>
-            <div class="amenities-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="amenity-item reveal">
-                    <div class="amenity-icon"><i class="fas fa-sun"></i></div>
-                    <h3 class="amenity-title">Desayuno</h3>
-                    <p class="amenity-desc">Variedad de frutas, panadería y platos calientes.<br><strong>07:30 - 10:00 hrs</strong></p>
-                </div>
-                <div class="amenity-item reveal">
-                    <div class="amenity-icon"><i class="fas fa-cloud-sun"></i></div>
-                    <h3 class="amenity-title">Almuerzo</h3>
-                    <p class="amenity-desc">Buffet completo con especialidades criollas.<br><strong>13:00 - 15:00 hrs</strong></p>
-                </div>
-                <div class="amenity-item reveal">
-                    <div class="amenity-icon"><i class="fas fa-moon"></i></div>
-                    <h3 class="amenity-title">Cena</h3>
-                    <p class="amenity-desc">Noches temáticas y lo mejor de la cocina internacional.<br><strong>19:00 - 22:00 hrs</strong></p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="section">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Reservas</span>
-                <h2 class="section-title">Reserve su Mesa</h2>
-                <p class="section-desc">Asegure su lugar para una experiencia gastronomica inolvidable.</p>
-            </div>
-            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);" class="reveal">
-                <form style="display: flex; flex-direction: column; gap: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Nombre</label>
-                            <input type="text" style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px;" placeholder="Su nombre">
+            <!-- ======== MODO HUESPED ======== -->
+            <div id="guestView">
+                <div class="res-tabs">
+                    <button class="res-tab active" data-tab="services" onclick="switchTab('services')">Servicios</button>
+                    <button class="res-tab" data-tab="reserve" onclick="switchTab('reserve')">Nueva Reserva</button>
+                    <button class="res-tab" data-tab="myreserves" onclick="switchTab('myreserves')">Mis Reservas</button>
+                </div>
+
+                <!-- SERVICIOS -->
+                <div id="section-services" class="res-section active">
+                    <div class="service-cards-grid">
+                        <div class="service-card-rc">
+                            <div class="service-card-header">
+                                <div>
+                                    <div class="service-card-title">Restaurante Los Tainos</div>
+                                    <div class="service-card-location">Buffet internacional — Area de jardines</div>
+                                </div>
+                                <span class="service-tag"><i class="fas fa-utensils" style="font-size:10px;"></i> Buffet</span>
+                            </div>
+                            <table class="service-schedule">
+                                <tr><th>Servicio</th><th>Horario</th><th>Detalles</th></tr>
+                                <tr><td><i class="fas fa-sun" style="color:var(--color-accent);margin-right:6px;"></i>Desayuno</td><td>07:30 — 10:00</td><td>Opciones criollas e internacionales</td></tr>
+                                <tr><td><i class="fas fa-cloud-sun" style="color:var(--color-accent);margin-right:6px;"></i>Almuerzo</td><td>13:00 — 15:00</td><td>Platos tradicionales cubanos</td></tr>
+                                <tr><td><i class="fas fa-moon" style="color:var(--color-accent);margin-right:6px;"></i>Cena</td><td>19:00 — 22:00</td><td>Musica en vivo en algunas ocasiones</td></tr>
+                            </table>
+                            <div class="service-note">
+                                <i class="fas fa-info-circle"></i>
+                                <span>El buffet <strong>no incluye bebidas</strong> en el precio base. Dietas especiales y opciones vegetarianas <strong>bajo solicitud</strong>. Codigo de vestimenta: informal elegante.</span>
+                            </div>
                         </div>
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Apellido</label>
-                            <input type="text" style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px;" placeholder="Su apellido">
+
+                        <div class="service-card-rc">
+                            <div class="service-card-header">
+                                <div>
+                                    <div class="service-card-title">Snack Bar Cuba Cuba</div>
+                                    <div class="service-card-location">Area de la piscina</div>
+                                </div>
+                                <span class="service-tag evening"><i class="fas fa-cocktail" style="font-size:10px;"></i> Snack</span>
+                            </div>
+                            <table class="service-schedule">
+                                <tr><th>Servicio</th><th>Horario</th><th>Detalles</th></tr>
+                                <tr><td><i class="fas fa-fire" style="color:var(--color-accent);margin-right:6px;"></i>Meriendas y bebidas</td><td>09:00 — 18:00</td><td>Parrillada al carbon, snacks, cocteles</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="service-card-rc">
+                            <div class="service-card-header">
+                                <div>
+                                    <div class="service-card-title">Sala de Fiestas Songa Club</div>
+                                    <div class="service-card-location">Discoteca y entretenimiento nocturno</div>
+                                </div>
+                                <span class="service-tag night"><i class="fas fa-music" style="font-size:10px;"></i> Nocturno</span>
+                            </div>
+                            <table class="service-schedule">
+                                <tr><th>Servicio</th><th>Horario</th><th>Detalles</th></tr>
+                                <tr><td><i class="fas fa-compact-disc" style="color:var(--color-accent);margin-right:6px;"></i>Discoteca</td><td>22:00 — 02:00</td><td>Musica en vivo, DJ, eventos tematicos</td></tr>
+                            </table>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Fecha</label>
-                            <input type="date" style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px;">
+
+                    <div class="res-alert res-alert-warning" style="margin-top: 24px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Se recomienda coordinar reservas con <strong>24 horas de anticipacion</strong>. Los horarios pueden variar segun temporada turistica y nivel de ocupacion del hotel.</span>
+                    </div>
+                </div>
+
+                <!-- NUEVA RESERVA -->
+                <div id="section-reserve" class="res-section">
+                    <form id="reservationForm" onsubmit="return false;" style="max-width: 700px;">
+                        <div class="res-form-row">
+                            <div class="res-form-group">
+                                <label class="res-form-label">Nombre completo</label>
+                                <input type="text" id="guestName" class="res-form-input" placeholder="Ej: Maria Gonzalez" required>
+                            </div>
+                            <div class="res-form-group">
+                                <label class="res-form-label">Habitacion</label>
+                                <input type="text" id="roomNumber" class="res-form-input" placeholder="Ej: 205" required>
+                            </div>
                         </div>
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Hora</label>
-                            <select style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px;">
-                                <option>7:00 PM</option>
-                                <option>7:30 PM</option>
-                                <option>8:00 PM</option>
-                                <option>8:30 PM</option>
-                                <option>9:00 PM</option>
+
+                        <div class="res-form-group">
+                            <label class="res-form-label">Servicio a reservar</label>
+                            <select id="serviceSelect" class="res-form-select" onchange="onServiceChange()" required>
+                                <option value="">Selecciona un servicio...</option>
+                                <option value="tainos-desayuno">Los Tainos — Desayuno (07:30 - 10:00)</option>
+                                <option value="tainos-almuerzo">Los Tainos — Almuerzo (13:00 - 15:00)</option>
+                                <option value="tainos-cena">Los Tainos — Cena (19:00 - 22:00)</option>
+                                <option value="cubacuba">Snack Bar Cuba Cuba (09:00 - 18:00)</option>
+                                <option value="songa">Songa Club — Discoteca (22:00 - 02:00)</option>
                             </select>
                         </div>
+
+                        <div class="res-form-row">
+                            <div class="res-form-group">
+                                <label class="res-form-label">Fecha</label>
+                                <input type="date" id="resDate" class="res-form-input" onchange="validateDate()" required>
+                            </div>
+                            <div class="res-form-group">
+                                <label class="res-form-label">Hora</label>
+                                <input type="time" id="resTime" class="res-form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="res-form-group">
+                            <label class="res-form-label">Numero de personas</label>
+                            <input type="number" id="guestCount" class="res-form-input" min="1" max="20" value="2" required>
+                        </div>
+
+                        <div class="res-form-group">
+                            <label class="res-form-label">Notas especiales</label>
+                            <textarea id="specialNotes" class="res-form-textarea" placeholder="Dietas especiales, vegetarianos, alergias, celebracion, etc."></textarea>
+                        </div>
+
+                        <div id="advanceWarning" class="res-alert res-alert-warning" style="display:none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>La reserva es con <strong>menos de 24 horas</strong> de anticipacion. Te recomendamos confirmar directamente en recepcion llamando al <strong>(+53 42) 21 8141</strong>.</span>
+                        </div>
+
+                        <div id="summaryBox" class="summary-box" style="display:none;">
+                            <div class="summary-title">Resumen de la reserva</div>
+                            <div class="summary-row"><span class="summary-label">Huesped</span><span class="summary-value" id="sumName">-</span></div>
+                            <div class="summary-row"><span class="summary-label">Habitacion</span><span class="summary-value" id="sumRoom">-</span></div>
+                            <div class="summary-row"><span class="summary-label">Servicio</span><span class="summary-value" id="sumService">-</span></div>
+                            <div class="summary-row"><span class="summary-label">Fecha y hora</span><span class="summary-value" id="sumDateTime">-</span></div>
+                            <div class="summary-row"><span class="summary-label">Personas</span><span class="summary-value" id="sumCount">-</span></div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button type="button" class="res-btn res-btn-secondary" onclick="previewReservation()">
+                                <i class="fas fa-eye"></i> Previsualizar
+                            </button>
+                            <button type="button" class="res-btn res-btn-primary" onclick="submitReservation()">
+                                <i class="fas fa-save"></i> Guardar Reserva
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- MIS RESERVAS -->
+                <div id="section-myreserves" class="res-section">
+                    <div id="reservationsList"></div>
+                    <div id="emptyReserves" class="empty-state" style="display:none;">
+                        <i class="fas fa-clipboard-list"></i>
+                        <div class="empty-state-title">Sin reservas guardadas</div>
+                        <div class="empty-state-desc">Crea una reserva en la pestana "Nueva Reserva"</div>
                     </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Numero de Personas</label>
-                        <select style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px;">
-                            <option>2 Personas</option>
-                            <option>3 Personas</option>
-                            <option>4 Personas</option>
-                            <option>5-8 Personas</option>
-                            <option>Grupo (+8)</option>
+                </div>
+            </div>
+
+            <!-- ======== MODO RECEPCIONISTA ======== -->
+            <div id="receptionView" style="display:none;">
+                <div class="res-tabs">
+                    <button class="res-tab active" data-tab="dashboard" onclick="switchReceptionTab('dashboard')">Panel</button>
+                    <button class="res-tab" data-tab="allreserves" onclick="switchReceptionTab('allreserves')">Todas las Reservas</button>
+                    <button class="res-tab" data-tab="newreserve" onclick="switchReceptionTab('newreserve')">Nueva Reserva</button>
+                </div>
+
+                <!-- DASHBOARD -->
+                <div id="section-dashboard" class="res-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statTotal">0</div>
+                            <div class="stat-label">Total reservas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statToday">0</div>
+                            <div class="stat-label">Hoy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statPending">0</div>
+                            <div class="stat-label">Pendientes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statConfirmed">0</div>
+                            <div class="stat-label">Confirmadas</div>
+                        </div>
+                    </div>
+
+                    <div style="font-family: var(--font-serif); font-size: 20px; color: var(--color-primary); margin-bottom: 16px; font-weight: 500;">Reservas de hoy</div>
+                    <div id="todayReservations"></div>
+                </div>
+
+                <!-- TODAS LAS RESERVAS -->
+                <div id="section-allreserves" class="res-section">
+                    <div class="filter-bar">
+                        <input type="date" id="filterDate" class="res-form-input" onchange="renderReceptionReservations()">
+                        <select id="filterService" class="res-form-select" onchange="renderReceptionReservations()">
+                            <option value="">Todos los servicios</option>
+                            <option value="tainos-desayuno">Los Tainos — Desayuno</option>
+                            <option value="tainos-almuerzo">Los Tainos — Almuerzo</option>
+                            <option value="tainos-cena">Los Tainos — Cena</option>
+                            <option value="cubacuba">Snack Bar Cuba Cuba</option>
+                            <option value="songa">Songa Club</option>
+                        </select>
+                        <select id="filterStatus" class="res-form-select" onchange="renderReceptionReservations()">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="confirmada">Confirmada</option>
+                            <option value="cancelada">Cancelada</option>
                         </select>
                     </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-light); margin-bottom: 8px; display: block;">Solicitudes Especiales</label>
-                        <textarea style="width: 100%; padding: 12px 16px; border: 1.5px solid #E5E5E5; border-radius: 4px; font-family: var(--font-sans); font-size: 15px; resize: vertical; min-height: 100px;" placeholder="Alergias, ocasion especial, preferencias..."></textarea>
+                    <div id="allReservationsList"></div>
+                </div>
+
+                <!-- NUEVA RESERVA RECEPCION -->
+                <div id="section-newreserve" class="res-section">
+                    <div class="res-alert res-alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Desde aqui puede crear reservas directamente y enviar la confirmacion por correo al huesped y a <strong>reservas@caneyes.hor.tur.cu</strong>.</span>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Confirmar Reserva</button>
-                </form>
+                    <form id="receptionForm" onsubmit="return false;" style="max-width: 700px;">
+                        <div class="res-form-row">
+                            <div class="res-form-group">
+                                <label class="res-form-label">Nombre del huesped</label>
+                                <input type="text" id="recGuestName" class="res-form-input" placeholder="Ej: Maria Gonzalez" required>
+                            </div>
+                            <div class="res-form-group">
+                                <label class="res-form-label">Habitacion</label>
+                                <input type="text" id="recRoomNumber" class="res-form-input" placeholder="Ej: 205" required>
+                            </div>
+                        </div>
+                        <div class="res-form-row">
+                            <div class="res-form-group">
+                                <label class="res-form-label">Correo del huesped (opcional)</label>
+                                <input type="email" id="recGuestEmail" class="res-form-input" placeholder="huesped@email.com">
+                            </div>
+                            <div class="res-form-group">
+                                <label class="res-form-label">Telefono (opcional)</label>
+                                <input type="tel" id="recGuestPhone" class="res-form-input" placeholder="+53 ...">
+                            </div>
+                        </div>
+                        <div class="res-form-group">
+                            <label class="res-form-label">Servicio</label>
+                            <select id="recServiceSelect" class="res-form-select" required>
+                                <option value="">Selecciona un servicio...</option>
+                                <option value="tainos-desayuno">Los Tainos — Desayuno (07:30 - 10:00)</option>
+                                <option value="tainos-almuerzo">Los Tainos — Almuerzo (13:00 - 15:00)</option>
+                                <option value="tainos-cena">Los Tainos — Cena (19:00 - 22:00)</option>
+                                <option value="cubacuba">Snack Bar Cuba Cuba (09:00 - 18:00)</option>
+                                <option value="songa">Songa Club — Discoteca (22:00 - 02:00)</option>
+                            </select>
+                        </div>
+                        <div class="res-form-row">
+                            <div class="res-form-group">
+                                <label class="res-form-label">Fecha</label>
+                                <input type="date" id="recResDate" class="res-form-input" required>
+                            </div>
+                            <div class="res-form-group">
+                                <label class="res-form-label">Hora</label>
+                                <input type="time" id="recResTime" class="res-form-input" required>
+                            </div>
+                        </div>
+                        <div class="res-form-group">
+                            <label class="res-form-label">Numero de personas</label>
+                            <input type="number" id="recGuestCount" class="res-form-input" min="1" max="20" value="2" required>
+                        </div>
+                        <div class="res-form-group">
+                            <label class="res-form-label">Notas</label>
+                            <textarea id="recSpecialNotes" class="res-form-textarea" placeholder="Dietas especiales, vegetarianos, celebracion..."></textarea>
+                        </div>
+                        <div class="res-form-group">
+                            <label class="res-checkbox-label">
+                                <input type="checkbox" id="recSendEmail" checked>
+                                Enviar confirmacion por correo a reservas@caneyes.hor.tur.cu
+                            </label>
+                        </div>
+                        <div id="emailPreviewBox" class="email-preview" style="display:none;"></div>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button type="button" class="res-btn res-btn-secondary" onclick="previewEmail()">
+                                <i class="fas fa-eye"></i> Previsualizar Email
+                            </button>
+                            <button type="button" class="res-btn res-btn-primary" onclick="submitReceptionReservation()">
+                                <i class="fas fa-paper-plane"></i> Crear y Confirmar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="footer" id="contacto">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <span class="logo-text">Los Caneyes</span>
-                    <p>Un santuario único inspirado en la arquitectura taína, rodeado de naturaleza y cultura en el centro de Cuba. Hospitalidad desde 1966.</p>
+                    <p>Un santuario unico inspirado en la arquitectura taina, rodeado de naturaleza y cultura en el centro de Cuba. Hospitalidad desde 1966.</p>
                     <div class="footer-social">
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -265,9 +947,8 @@
                 <div class="footer-column">
                     <h4>Explorar</h4>
                     <ul class="footer-links">
-                        <li><a href="habitaciones.html">Habitaciones</a></li>
+                        <li><a href="index.html#habitaciones">Habitaciones</a></li>
                         <li><a href="restaurante.html">Restaurante</a></li>
-                        <li><a href="index.html#amenidades">Spa & Bienestar</a></li>
                         <li><a href="index.html#experiencias">Experiencias</a></li>
                         <li><a href="index.html#ofertas">Ofertas Especiales</a></li>
                     </ul>
@@ -286,16 +967,13 @@
                     <ul class="footer-links">
                         <li><a href="tel:+5342218141"><i class="fas fa-phone"></i> (+53 42) 21 8141</a></li>
                         <li><a href="mailto:reservas@caneyes.hor.tur.cu"><i class="fas fa-envelope"></i> reservas@caneyes.hor.tur.cu</a></li>
-                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Av. Eucaliptos y Circunvalación</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Av. Eucaliptos y Circunvalacion</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i> Recepcion 24h</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <div class="footer-brand-logos" style="margin-bottom: 20px; display: flex; align-items: center; gap: 30px; opacity: 0.8;">
-                    <img src="imagenes/logo-cabecera.png" alt="Grupo Cubanacán" style="height: 40px;">
-                    <img src="imagenes/logo-marcas-horizontes.jpeg" alt="Marca Horizontes" style="height: 40px;">
-                </div>
-                <p>© 2026 Hotel Los Caneyes | Marca Horizontes - Grupo Cubanacán. Todos los derechos reservados.</p>
+                <p>© 2026 Hotel Los Caneyes | Marca Horizontes - Grupo Cubanacan. Todos los derechos reservados.</p>
                 <div class="footer-bottom-links">
                     <a href="#">Politica de Cookies</a>
                     <a href="#">Mapa del Sitio</a>
@@ -305,10 +983,386 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <div class="toast" id="toast"></div>
+
+    <script>
+
+        // ==================== DATA ====================
+        const serviceData = {
+            'tainos-desayuno': { name: 'Los Tainos — Desayuno', location: 'Area de jardines', start: '07:30', end: '10:00' },
+            'tainos-almuerzo': { name: 'Los Tainos — Almuerzo', location: 'Area de jardines', start: '13:00', end: '15:00' },
+            'tainos-cena': { name: 'Los Tainos — Cena', location: 'Area de jardines', start: '19:00', end: '22:00' },
+            'cubacuba': { name: 'Snack Bar Cuba Cuba', location: 'Area de la piscina', start: '09:00', end: '18:00' },
+            'songa': { name: 'Songa Club — Discoteca', location: 'Sala de fiestas', start: '22:00', end: '02:00' }
+        };
+
+        // Demo data
+        let reservations = [
+            { id: 1721900000001, name: 'Carlos Mendez', room: '101', serviceKey: 'tainos-desayuno', serviceName: 'Los Tainos — Desayuno', location: 'Area de jardines', date: new Date().toISOString().split('T')[0], time: '08:30', count: 2, notes: '', status: 'pendiente', email: '', phone: '', createdAt: new Date().toISOString() },
+            { id: 1721900000002, name: 'Ana Rodriguez', room: '205', serviceKey: 'tainos-cena', serviceName: 'Los Tainos — Cena', location: 'Area de jardines', date: new Date().toISOString().split('T')[0], time: '20:00', count: 4, notes: 'Celebracion de aniversario', status: 'confirmada', email: 'ana@email.com', phone: '+53 5xxxxxxx', createdAt: new Date().toISOString() },
+            { id: 1721900000003, name: 'Luis Torres', room: '312', serviceKey: 'cubacuba', serviceName: 'Snack Bar Cuba Cuba', location: 'Area de la piscina', date: new Date().toISOString().split('T')[0], time: '14:00', count: 1, notes: '', status: 'pendiente', email: '', phone: '', createdAt: new Date().toISOString() }
+        ];
+
+        let currentRole = 'guest';
+
+        // ==================== ROLE SWITCHING ====================
+        function setRole(role) {
+            currentRole = role;
+            document.getElementById('btnRoleGuest').classList.toggle('active', role === 'guest');
+            document.getElementById('btnRoleReception').classList.toggle('active', role === 'reception');
+            document.getElementById('guestView').style.display = role === 'guest' ? 'block' : 'none';
+            document.getElementById('receptionView').style.display = role === 'reception' ? 'block' : 'none';
+            if (role === 'reception') {
+                updateStats();
+                renderTodayReservations();
+            }
+        }
+
+        // ==================== TABS ====================
+        function switchTab(tab) {
+            document.querySelectorAll('#guestView .res-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#guestView .res-section').forEach(s => s.classList.remove('active'));
+            document.querySelector('#guestView [data-tab="' + tab + '"]').classList.add('active');
+            document.getElementById('section-' + tab).classList.add('active');
+            if (tab === 'myreserves') renderGuestReservations();
+        }
+
+        function switchReceptionTab(tab) {
+            document.querySelectorAll('#receptionView .res-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#receptionView .res-section').forEach(s => s.classList.remove('active'));
+            document.querySelector('#receptionView [data-tab="' + tab + '"]').classList.add('active');
+            document.getElementById('section-' + tab).classList.add('active');
+            if (tab === 'dashboard') { updateStats(); renderTodayReservations(); }
+            if (tab === 'allreserves') renderReceptionReservations();
+        }
+
+        // ==================== GUEST FUNCTIONS ====================
+        function onServiceChange() {
+            const sel = document.getElementById('serviceSelect').value;
+            if (sel && serviceData[sel]) {
+                document.getElementById('resTime').min = serviceData[sel].start;
+                document.getElementById('resTime').max = serviceData[sel].end;
+            }
+        }
+
+        function validateDate() {
+            const dateVal = document.getElementById('resDate').value;
+            if (!dateVal) return;
+            const selected = new Date(dateVal + 'T00:00:00');
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const diffHours = (selected - now) / (1000 * 60 * 60);
+            document.getElementById('advanceWarning').style.display = diffHours < 24 ? 'flex' : 'none';
+        }
+
+        function previewReservation() {
+            const name = document.getElementById('guestName').value.trim();
+            const room = document.getElementById('roomNumber').value.trim();
+            const service = document.getElementById('serviceSelect').value;
+            const date = document.getElementById('resDate').value;
+            const time = document.getElementById('resTime').value;
+            const count = document.getElementById('guestCount').value;
+            if (!name || !room || !service || !date || !time) {
+                showToast('Completa todos los campos obligatorios.');
+                return;
+            }
+            const sData = serviceData[service];
+            document.getElementById('sumName').textContent = name;
+            document.getElementById('sumRoom').textContent = room;
+            document.getElementById('sumService').textContent = sData.name + ' — ' + sData.location;
+            document.getElementById('sumDateTime').textContent = formatDate(date) + ' a las ' + time;
+            document.getElementById('sumCount').textContent = count + ' persona' + (count > 1 ? 's' : '');
+            document.getElementById('summaryBox').style.display = 'block';
+        }
+
+        function submitReservation() {
+            const name = document.getElementById('guestName').value.trim();
+            const room = document.getElementById('roomNumber').value.trim();
+            const service = document.getElementById('serviceSelect').value;
+            const date = document.getElementById('resDate').value;
+            const time = document.getElementById('resTime').value;
+            const count = document.getElementById('guestCount').value;
+            const notes = document.getElementById('specialNotes').value.trim();
+            if (!name || !room || !service || !date || !time) {
+                showToast('Completa todos los campos obligatorios.');
+                return;
+            }
+            const sData = serviceData[service];
+            const reservation = {
+                id: Date.now(), name, room, serviceKey: service, serviceName: sData.name, location: sData.location,
+                date, time, count: parseInt(count), notes, status: 'pendiente', email: '', phone: '',
+                createdAt: new Date().toISOString()
+            };
+            reservations.push(reservation);
+            showToast('Reserva guardada correctamente');
+            document.getElementById('reservationForm').reset();
+            document.getElementById('summaryBox').style.display = 'none';
+            document.getElementById('advanceWarning').style.display = 'none';
+        }
+
+        function renderGuestReservations() {
+            const container = document.getElementById('reservationsList');
+            const empty = document.getElementById('emptyReserves');
+            const myReserves = reservations.filter(r => r.status !== 'cancelada');
+            if (myReserves.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            container.innerHTML = myReserves.map(r => guestCardHTML(r)).join('');
+        }
+
+        function guestCardHTML(r) {
+            return `
+                <div class="res-card">
+                    <div class="res-card-header">
+                        <div>
+                            <div class="res-card-title">${esc(r.serviceName)}</div>
+                            <div class="res-card-meta">${esc(r.location)}</div>
+                        </div>
+                        <span class="status-badge status-${r.status}">${r.status}</span>
+                    </div>
+                    <div class="res-card-row"><i class="fas fa-user"></i> ${esc(r.name)} — Hab. ${esc(r.room)}</div>
+                    <div class="res-card-row"><i class="fas fa-calendar-alt"></i> ${formatDate(r.date)} a las ${r.time} — ${r.count} persona${r.count > 1 ? 's' : ''}</div>
+                    ${r.notes ? `<div class="res-card-row" style="font-style:italic; margin-top:6px;"><i class="fas fa-sticky-note"></i> ${esc(r.notes)}</div>` : ''}
+                    <div class="res-card-actions">
+                        <button class="res-btn res-btn-secondary res-btn-sm" onclick="copyReservation(${r.id})"><i class="fas fa-copy"></i> Copiar</button>
+                        <button class="res-btn res-btn-danger res-btn-sm" onclick="deleteReservation(${r.id})"><i class="fas fa-trash"></i> Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyReservation(id) {
+            const r = reservations.find(x => x.id === id);
+            if (!r) return;
+            const text = `Reserva Hotel Los Caneyes
+Huesped: ${r.name}
+Habitacion: ${r.room}
+Servicio: ${r.serviceName}
+Ubicacion: ${r.location}
+Fecha: ${formatDate(r.date)} a las ${r.time}
+Personas: ${r.count}
+${r.notes ? 'Notas: ' + r.notes : ''}
+---
+Contacto: reservas@caneyes.hor.tur.cu / (+53 42) 21 8141`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => showToast('Reserva copiada al portapapeles'));
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Reserva copiada al portapapeles');
+            }
+        }
+
+        function deleteReservation(id) {
+            if (!confirm('Eliminar esta reserva?')) return;
+            reservations = reservations.filter(x => x.id !== id);
+            renderGuestReservations();
+            showToast('Reserva eliminada');
+        }
+
+        // ==================== RECEPTION FUNCTIONS ====================
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('statTotal').textContent = reservations.length;
+            document.getElementById('statToday').textContent = reservations.filter(r => r.date === today).length;
+            document.getElementById('statPending').textContent = reservations.filter(r => r.status === 'pendiente').length;
+            document.getElementById('statConfirmed').textContent = reservations.filter(r => r.status === 'confirmada').length;
+        }
+
+        function renderTodayReservations() {
+            const today = new Date().toISOString().split('T')[0];
+            const container = document.getElementById('todayReservations');
+            const todayRes = reservations.filter(r => r.date === today).sort((a,b) => a.time.localeCompare(b.time));
+            if (todayRes.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-desc">No hay reservas para hoy</div></div>';
+                return;
+            }
+            container.innerHTML = todayRes.map(r => receptionCardHTML(r)).join('');
+        }
+
+        function renderReceptionReservations() {
+            const container = document.getElementById('allReservationsList');
+            const filterDate = document.getElementById('filterDate').value;
+            const filterService = document.getElementById('filterService').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            let filtered = [...reservations];
+            if (filterDate) filtered = filtered.filter(r => r.date === filterDate);
+            if (filterService) filtered = filtered.filter(r => r.serviceKey === filterService);
+            if (filterStatus) filtered = filtered.filter(r => r.status === filterStatus);
+            filtered.sort((a,b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-desc">No hay reservas que coincidan con los filtros</div></div>';
+                return;
+            }
+            container.innerHTML = filtered.map(r => receptionCardHTML(r)).join('');
+        }
+
+        function receptionCardHTML(r) {
+            return `
+                <div class="res-card">
+                    <div class="res-card-header">
+                        <div>
+                            <div class="res-card-title">${esc(r.serviceName)} <span class="status-badge status-${r.status}">${r.status}</span></div>
+                        </div>
+                    </div>
+                    <div class="res-card-row"><i class="fas fa-user"></i> ${esc(r.name)} — Hab. ${esc(r.room)}</div>
+                    <div class="res-card-row"><i class="fas fa-calendar-alt"></i> ${formatDate(r.date)} a las ${r.time} — ${r.count} persona${r.count > 1 ? 's' : ''}</div>
+                    ${r.notes ? `<div class="res-card-row" style="font-style:italic;"><i class="fas fa-sticky-note"></i> ${esc(r.notes)}</div>` : ''}
+                    ${r.email ? `<div class="res-card-row"><i class="fas fa-envelope"></i> ${esc(r.email)}</div>` : ''}
+                    ${r.phone ? `<div class="res-card-row"><i class="fas fa-phone"></i> ${esc(r.phone)}</div>` : ''}
+                    <div class="res-card-actions">
+                        ${r.status === 'pendiente' ? `<button class="res-btn res-btn-success res-btn-sm" onclick="confirmReservation(${r.id})"><i class="fas fa-check"></i> Confirmar</button>` : ''}
+                        ${r.status !== 'cancelada' ? `<button class="res-btn res-btn-danger res-btn-sm" onclick="cancelReservation(${r.id})"><i class="fas fa-times"></i> Cancelar</button>` : ''}
+                        <button class="res-btn res-btn-secondary res-btn-sm" onclick="copyReservation(${r.id})"><i class="fas fa-copy"></i> Copiar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function confirmReservation(id) {
+            const r = reservations.find(x => x.id === id);
+            if (r) { r.status = 'confirmada'; updateStats(); renderTodayReservations(); renderReceptionReservations(); showToast('Reserva confirmada'); }
+        }
+
+        function cancelReservation(id) {
+            if (!confirm('Cancelar esta reserva?')) return;
+            const r = reservations.find(x => x.id === id);
+            if (r) { r.status = 'cancelada'; updateStats(); renderTodayReservations(); renderReceptionReservations(); showToast('Reserva cancelada'); }
+        }
+
+        // ==================== EMAIL / RECEPTION FORM ====================
+        function previewEmail() {
+            const name = document.getElementById('recGuestName').value.trim();
+            const room = document.getElementById('recRoomNumber').value.trim();
+            const service = document.getElementById('recServiceSelect').value;
+            const date = document.getElementById('recResDate').value;
+            const time = document.getElementById('recResTime').value;
+            const count = document.getElementById('recGuestCount').value;
+            const notes = document.getElementById('recSpecialNotes').value.trim();
+
+            if (!name || !room || !service || !date || !time) {
+                showToast('Completa los campos obligatorios');
+                return;
+            }
+            const sData = serviceData[service];
+            const body = `Asunto: Confirmacion de reserva gastronomica — Hotel Los Caneyes
+
+Estimado/a ${name},
+
+Su reserva ha sido registrada exitosamente:
+
+Servicio: ${sData.name}
+Ubicacion: ${sData.location}
+Fecha: ${formatDate(date)}
+Hora: ${time}
+Habitacion: ${room}
+Personas: ${count}
+${notes ? 'Notas especiales: ' + notes : ''}
+
+Si necesita modificar o cancelar su reserva, contacte a recepcion:
+Telefono: (+53 42) 21 8141 al 43
+Email: reservas@caneyes.hor.tur.cu
+
+Saludos cordiales,
+Hotel Los Caneyes — Marca Horizontes`;
+
+            document.getElementById('emailPreviewBox').textContent = body;
+            document.getElementById('emailPreviewBox').style.display = 'block';
+        }
+
+        function submitReceptionReservation() {
+            const name = document.getElementById('recGuestName').value.trim();
+            const room = document.getElementById('recRoomNumber').value.trim();
+            const service = document.getElementById('recServiceSelect').value;
+            const date = document.getElementById('recResDate').value;
+            const time = document.getElementById('recResTime').value;
+            const count = document.getElementById('recGuestCount').value;
+            const notes = document.getElementById('recSpecialNotes').value.trim();
+            const email = document.getElementById('recGuestEmail').value.trim();
+            const phone = document.getElementById('recGuestPhone').value.trim();
+            const sendEmail = document.getElementById('recSendEmail').checked;
+
+            if (!name || !room || !service || !date || !time) {
+                showToast('Completa los campos obligatorios');
+                return;
+            }
+            const sData = serviceData[service];
+            const reservation = {
+                id: Date.now(), name, room, serviceKey: service, serviceName: sData.name, location: sData.location,
+                date, time, count: parseInt(count), notes, status: 'confirmada', email, phone,
+                createdAt: new Date().toISOString()
+            };
+            reservations.push(reservation);
+
+            if (sendEmail) {
+                const subject = encodeURIComponent('Confirmacion de reserva gastronomica — Hotel Los Caneyes');
+                const body = encodeURIComponent(`Estimado/a ${name},
+
+Su reserva ha sido registrada exitosamente:
+
+Servicio: ${sData.name}
+Ubicacion: ${sData.location}
+Fecha: ${formatDate(date)}
+Hora: ${time}
+Habitacion: ${room}
+Personas: ${count}
+${notes ? 'Notas especiales: ' + notes : ''}
+
+Si necesita modificar o cancelar su reserva, contacte a recepcion:
+Telefono: (+53 42) 21 8141 al 43
+Email: reservas@caneyes.hor.tur.cu
+
+Saludos cordiales,
+Hotel Los Caneyes — Marca Horizontes`);
+                const to = email || 'reservas@caneyes.hor.tur.cu';
+                window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
+            }
+
+            showToast('Reserva creada y confirmada');
+            document.getElementById('receptionForm').reset();
+            document.getElementById('emailPreviewBox').style.display = 'none';
+            updateStats();
+            renderTodayReservations();
+        }
+
+        // ==================== UTILS ====================
+        function formatDate(d) {
+            const parts = d.split('-');
+            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+
+        function esc(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('resDate').min = today;
+        document.getElementById('recResDate').min = today;
+        document.getElementById('filterDate').value = today;
+
+        // Mobile toggle
+        document.getElementById('mobileToggle').addEventListener('click', function() {
+            document.getElementById('nav').classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
-
-
-
-
